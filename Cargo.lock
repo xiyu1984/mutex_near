@@ -2847,6 +2847,7 @@ dependencies = [
 name = "test_mutex"
 version = "0.1.0"
 dependencies = [
+ "hex",
  "near-sdk",
 ]
 
