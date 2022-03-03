@@ -1,0 +1,24 @@
+[package]
+name = "mutexnear"
+version = "0.0.1"
+edition = "2018"
+
+[dev-dependencies]
+near-sdk = "4.0.0-pre.6"
+near-sdk-sim = "4.0.0-pre.6"
+mutex_near = {path = './mutex_near'}
+test_mutex = {path = './test_mutex'}
+
+[profile.release]
+codegen-units = 1
+opt-level = "z"
+lto = true
+debug = false
+panic = "abort"
+overflow-checks = true
+
+[workspace]
+members = [
+    "mutex_near",
+    "test_mutex",
+]
