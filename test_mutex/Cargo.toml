@@ -2,13 +2,14 @@
 name = "test_mutex"
 version = "0.1.0"
 authors = ["https://github.com/xiyu1984"]
-edition = "2018"
+edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-near-sdk = "4.0.0-pre.6"
+near-sdk = "4.0.0-pre.4"
+near-contract-standards = "4.0.0-pre.4"
 hex = "0.4.3"
 
 [profile.release]

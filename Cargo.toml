@@ -1,11 +1,11 @@
 [package]
 name = "mutexnear"
 version = "0.0.1"
-edition = "2018"
+edition = "2021"
 
 [dev-dependencies]
-near-sdk = "3.1.0"
-near-sdk-sim = "3.1.0"
+near-sdk = "4.0.0-pre.4"
+near-sdk-sim = "4.0.0-pre.4"
 mutex_near = {path = './mutex_near'}
 test_mutex = {path = './test_mutex'}
 
