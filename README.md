@@ -6,6 +6,18 @@ We met a special situation when developing near contracts. Before contract A.f1(
 So are there any methods, we can keep the status of the context along with the processing in B.g1()  and the callback? That's what we are looking for in this project. 
 We will upgrade when getting any progress.
 
+## Conclusion
+If two invocations to a same interface happens in the same block, the situation above will make a mistake. This is because the cross-contract call will happen in next block in near protocol.
+
+<img src="./image/without locker.png">
+
+If we add a mechanism like locker, the problom will be solved.
+
+<img src="./image/with locker.png">
+
+### Full Process
+I'll add explain for the mutex and the test soon...
+
 ## Getting started
 
 To get started with this template:

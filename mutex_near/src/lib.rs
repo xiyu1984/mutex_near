@@ -52,7 +52,7 @@ impl Contract {
 
         let prepaid_gas = env::prepaid_gas();
 
-        // self.lock();
+        self.lock();
 
         // the state we keep before cross-contract call finished. (That is, we don't unlock before the `callback_and_unlock` completed.)
         self.md.i += 1;
@@ -74,7 +74,7 @@ impl Contract {
     #[private]
     pub fn callback_and_unlock(&mut self){
         // unlock first
-        // self.unlock();
+        self.unlock();
 
         match env::promise_result(0){
             PromiseResult::Successful(result) =>{
