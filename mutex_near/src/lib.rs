@@ -5,7 +5,7 @@ use near_sdk::PanicOnDefault;
 use near_sdk::json_types::{Base64VecU8};
 use near_sdk::serde::{Deserialize, Serialize};
 
-const GAS_FOR_FUNCTION_CALL: Gas = Gas(5_000_000_000_000);
+const GAS_FOR_FUNCTION_CALL: Gas = Gas(40_000_000_000_000);
 const GAS_FOR_CALLBACK: Gas = Gas(5_000_000_000_000);
 
 #[derive(Serialize, Deserialize, BorshDeserialize, BorshSerialize, Debug, Clone)]
@@ -26,7 +26,7 @@ pub struct Contract {
 
 #[ext_contract(ext_self)]
 pub trait ContractCallback{
-    fn callback(&mut self);
+    fn callback_and_unlock(&mut self);
 }
 
 
@@ -46,12 +46,15 @@ impl Contract {
 
     // ADD CONTRACT METHODS HERE
     pub fn cross_call_mutex(&mut self, account_id: AccountId, method_name: String, args: String){
+        // env::panic_str("we always panic!");
+
         let arguments = Base64VecU8::from(args.into_bytes());
 
         let prepaid_gas = env::prepaid_gas();
 
-        self.lock();
+        // self.lock();
 
+        // the state we keep before cross-contract call finished. (That is, we don't unlock before the `callback_and_unlock` completed.)
         self.md.i += 1;
         self.md.v.push(self.md.i);
 
@@ -60,24 +63,25 @@ impl Contract {
             arguments.into(), 
             0, 
             GAS_FOR_FUNCTION_CALL)
-        .then(ext_self::callback(env::current_account_id(), 0, GAS_FOR_CALLBACK));
+        .then(ext_self::callback_and_unlock(env::current_account_id(), 0, GAS_FOR_CALLBACK));
     }
 
     pub fn getContext(&self) -> MyData{
+        // log!("**********in mutex `getContext`**********");
         self.md.clone()
     }
 
     #[private]
-    pub fn callback(&mut self){
+    pub fn callback_and_unlock(&mut self){
+        // unlock first
+        // self.unlock();
+
         match env::promise_result(0){
             PromiseResult::Successful(result) =>{
                 match near_sdk::serde_json::from_slice::<String>(&result) {
                     Ok(s) => {
                         // cross contract call is completed here.
                         log!("{:#?}", s);
-                        log!("{}", self.locker);
-                        self.unlock();
-                        log!("{}", self.locker);
                     }
                     Err(err) => {
                         log!("mutex resolve promise result failed, {}", err);
@@ -85,7 +89,7 @@ impl Contract {
                 }
             }
             _ =>{
-                env::panic_str("in mutex callback!, but params error!");
+                env::panic_str("in mutex callback! Cross-contract call failed!");
             }
         }
     }

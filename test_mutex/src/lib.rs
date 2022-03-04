@@ -5,8 +5,8 @@ use near_sdk::json_types::{Base64VecU8};
 use near_sdk::collections::{LookupMap};
 use near_sdk::PanicOnDefault;
 
-const GAS_FOR_FUNCTION_CALL: Gas = Gas(30_000_000_000_000);
-const GAS_FOR_CALLBACK: Gas = Gas(30_000_000_000_000);
+const GAS_FOR_FUNCTION_CALL: Gas = Gas(100_000_000_000_000);
+const GAS_FOR_CALLBACK: Gas = Gas(5_000_000_000_000);
 
 #[derive(Serialize, Deserialize, BorshDeserialize, BorshSerialize)]
 #[serde(crate = "near_sdk::serde")]
@@ -26,6 +26,8 @@ pub struct Contract {
 #[ext_contract(ext_self)]
 pub trait ContractCallback{
     fn callback(&mut self);
+
+    fn callbacl_for_state(&mut self)-> String;
 }
 
 
@@ -38,10 +40,6 @@ impl Contract {
         }
     } 
 
-    pub fn onERC721Received(&self, operator: String, from: String, token_id: String, data: String){
-        log!("{} transfered {} from {} to me. Info: {}", operator, token_id, from, data);
-    }
-
     // ADD CONTRACT METHODS HERE
     pub fn say_hello() ->String {
         String::from("hello near!")
@@ -51,37 +49,27 @@ impl Contract {
         String::from("hello near!")
     }
 
-    pub fn get_my_data(&self)-> MyData{
-        MyData{
-            s: "hello".to_string(),
-            i: -73,
-            v: vec![1,2,3],
-        }
-    }
+    pub fn visit_state(&mut self) -> Promise{
 
-    pub fn set_and_get_md(&mut self, md: MyData) ->MyData{
-        let mut md = md;
-        md.s = hex::encode(near_sdk::env::sha256(md.s.as_bytes()));
-        md
+        // log!("**********in test `visit_state`**********");
+
+        let prepaid_gas = env::prepaid_gas();
+
+        Promise::new(env::predecessor_account_id())
+            .function_call("getContext".to_string(), 
+                            Vec::new(), 
+                            0, 
+                            Gas(5_000_000_000_000))
+            .then(ext_self::callbacl_for_state(env::current_account_id(), 0, Gas(5_000_000_000_000)))
     }
     
-    // insert can modify the val related to the key directly when the key exist in contract call
-    pub fn inster_val(&mut self, k: i32, s: String){
-        let mk = k;
-        let ms = s;
-        self.lm.insert(&mk, &ms);
-    }
-
-    pub fn get_val(&self, k: i32) -> Option<String>{
-        self.lm.get(&k)
-    }
-
     // cross_call
     pub fn cross_call_test(&mut self, account_id: AccountId, method_name: String, args: String){
         let arguments = Base64VecU8::from(args.into_bytes());
 
         let prepaid_gas = env::prepaid_gas();
 
+        // make two invacations for one contarct call in one block(exactly in the next block).
         Promise::new(account_id.clone())
         .function_call(method_name.clone(), 
             arguments.clone().into(), 
@@ -96,7 +84,7 @@ impl Contract {
     }
 
     #[private]
-    pub fn p_say_hello(&self) -> String{
+    fn p_say_hello(&self) -> String{
         String::from("hello near!")
     }
 
@@ -111,12 +99,38 @@ impl Contract {
                         log!("test contract callback ok: {:#?}", s);
                     }
                     Err(err) => {
-                        log!("mutex resolve promise result failed, {}", err);
+                        log!("test resolve promise result failed, {}", err);
                     }
                 }
             }
             _ =>{
-                env::panic_str("in test callback!, but params error!");
+                env::panic_str("in test callback!Cross-contract call failed!");
+            }
+        }
+    }
+
+    #[private]
+    pub fn callbacl_for_state(&mut self) -> String{
+
+        // log!("**********in test `callbacl_for_state`**********");
+
+        require!(env::promise_results_count() == 1);
+
+        match env::promise_result(0){
+            PromiseResult::Successful(result) =>{
+                match near_sdk::serde_json::from_slice::<MyData>(&result) {
+                    Ok(s) => {
+                        format!("hello near, state:{}", s.i).to_string()
+                    }
+                    Err(err) => {
+                        log!("test resolve promise result failed, {}", err);
+                        String::from("hello near error!")
+                    }
+                }
+            }
+            _ =>{
+                env::panic_str("in test callback!Cross-contract call failed!");
+                String::from("hello near error!")
             }
         }
     }

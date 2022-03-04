@@ -60,7 +60,7 @@ fn mytest(){
 
     // println!("\n\n{:?}", result2.promise_results());
 
-    let seconde_call_args = json!({"account_id": test.account_id(), "method_name": "c_say_hello", "args": ""}).to_string();
+    let seconde_call_args = json!({"account_id": test.account_id(), "method_name": "visit_state", "args": ""}).to_string();
     println!("{}", seconde_call_args);
     let result = root.call(test.account_id(), "cross_call_test", &json!({"account_id": mutex.account_id(), "method_name": "cross_call_mutex", "args": seconde_call_args}).to_string().into_bytes(), DEFAULT_GAS, 0);
     println!("\n\n{:?}", result.promise_results());
