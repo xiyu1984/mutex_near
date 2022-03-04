@@ -45,7 +45,7 @@ impl Contract {
     }
 
     // ADD CONTRACT METHODS HERE
-    pub fn cross_call(&mut self, account_id: AccountId, method_name: String, args: String){
+    pub fn cross_call_mutex(&mut self, account_id: AccountId, method_name: String, args: String){
         let arguments = Base64VecU8::from(args.into_bytes());
 
         let prepaid_gas = env::prepaid_gas();
@@ -75,15 +75,17 @@ impl Contract {
                     Ok(s) => {
                         // cross contract call is completed here.
                         log!("{:#?}", s);
+                        log!("{}", self.locker);
                         self.unlock();
+                        log!("{}", self.locker);
                     }
                     Err(err) => {
-                        log!("resolve promise result failed, {}", err);
+                        log!("mutex resolve promise result failed, {}", err);
                     }
                 }
             }
             _ =>{
-                env::panic_str("in callback!, but params error!");
+                env::panic_str("in mutex callback!, but params error!");
             }
         }
     }
