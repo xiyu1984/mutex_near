@@ -53,6 +53,7 @@ impl Contract {
         let prepaid_gas = env::prepaid_gas();
 
         self.lock();
+        // env::panic_str("panic always!");
 
         // the state we keep before cross-contract call finished. (That is, we don't unlock before the `callback_and_unlock` completed.)
         self.md.i += 1;
@@ -67,6 +68,8 @@ impl Contract {
             GAS_FOR_FUNCTION_CALL)
         .then(ext_self::callback_and_unlock(env::current_account_id(), 0, GAS_FOR_CALLBACK));
 
+        // The state will not be changed where ever paniced in this transaction.
+        // env::panic_str("panic always!");
         // self.lock();
     }
 

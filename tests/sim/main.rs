@@ -54,11 +54,10 @@ fn mytest(){
     // println!("{:?}", result.promise_results());
     assert!(result.is_ok());
 
-    // let result1 = root.call(mutex.account_id(), "cross_call", &json!({"account_id": test.account_id(), "method_name": "c_say_hello", "args": ""}).to_string().into_bytes(), DEFAULT_GAS, 0);
-    // let result2 = root.call(mutex.account_id(), "cross_call", &json!({"account_id": test.account_id(), "method_name": "c_say_hello", "args": ""}).to_string().into_bytes(), DEFAULT_GAS, 0);
-    // println!("{:?}", result1.promise_results());
-
-    // println!("\n\n{:?}", result2.promise_results());
+    // let result1 = root.call(mutex.account_id(), "cross_call_mutex", &json!({"account_id": test.account_id(), "method_name": "c_say_hello", "args": ""}).to_string().into_bytes(), DEFAULT_GAS, 0);
+    // println!("result1 {:?}", result1.promise_results());
+    // let result2 = root.call(mutex.account_id(), "getContext", &json!({}).to_string().into_bytes(), DEFAULT_GAS, 0);
+    // println!("result2 {:?}", result2.promise_results());
 
     let seconde_call_args = json!({"account_id": test.account_id(), "method_name": "visit_state", "args": ""}).to_string();
     println!("{}", seconde_call_args);

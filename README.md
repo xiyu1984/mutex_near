@@ -20,8 +20,8 @@ If we add a mechanism like locker, the problom will be solved.
 2.  In contract `test_mutex`:
 - I organize  two cross-contract calls to `cross_call_mutex` in contract `mutex_near` in two transactions in the same block, the related interface is`test_mutex::cross_call_test`;
 3. In contract `mutex_near`:
-- Set a state(`md: MyData`) with a lock operation , and then make a cross-contract call to `test_mutex::visit_state`;
-- The **lock** operation can be execute before or after the cross-contract call because of the atomic of the transaction, but must be execute before setting the state;
+- Within `cross_call_mutex`, I set a state(`md: MyData`) with a lock operation , and then make a cross-contract call to `test_mutex::visit_state`;
+- The **lock** operation can be execute either at the beginning or at the end of `cross_call_mutex` because of the **atomic of the transaction**;
 - The result will be shown in the related call back function(`callback_and_unlock`), the **unlock** operation must be execute the first line;
 4. In contract `test_mutex`:
 - In `visit_state` called from `mutex_near`, make a cross-contract call to `mutex_near::getContext` to get the state setted in `mutex_near`;
