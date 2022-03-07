@@ -16,15 +16,19 @@ If we add a mechanism like locker, the problom will be solved.
 <img src="./image/with locker.png">
 
 ### Full Process
-- I deployed contract mutex_near and test_mutex;
-- In contract `test_mutex`:
-    * I organize  two cross-contract calls to `cross_call_mutex` in contract `mutex_near` in two transactions in the same block, the related interface is`test_mutex::cross_call_test`;
-- In contract `mutex_near`:
-    * Set a state(`md: MyData`) with a lock operation , and then make a cross-contract call to `test_mutex::visit_state`;
-    * The lock operation can be execute before or after the cross-contract call because of the atomic of the transaction, but must be execute before setting the state;
-    * The result will be shown in the related call back function(`callback_and_unlock`), the unlock operation must be execute the first line;
-- In contract `test_mutex`:
-    * 
+1. I deployed contract mutex_near and test_mutex;
+2.  In contract `test_mutex`:
+- I organize  two cross-contract calls to `cross_call_mutex` in contract `mutex_near` in two transactions in the same block, the related interface is`test_mutex::cross_call_test`;
+3. In contract `mutex_near`:
+- Set a state(`md: MyData`) with a lock operation , and then make a cross-contract call to `test_mutex::visit_state`;
+- The **lock** operation can be execute before or after the cross-contract call because of the atomic of the transaction, but must be execute before setting the state;
+- The result will be shown in the related call back function(`callback_and_unlock`), the **unlock** operation must be execute the first line;
+4. In contract `test_mutex`:
+- In `visit_state` called from `mutex_near`, make a cross-contract call to `mutex_near::getContext` to get the state setted in `mutex_near`;
+- Organized a reply about the state, return to `mutex_near::callback_and_unlock`;
+5. In contract `mutex_near`:
+- Print the result in `callback_and_unlock`(In fact we can check the state in `test_mutex`).
+
 
 ## Getting started
 
