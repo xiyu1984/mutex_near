@@ -16,7 +16,15 @@ If we add a mechanism like locker, the problom will be solved.
 <img src="./image/with locker.png">
 
 ### Full Process
-I'll add explain for the mutex and the test soon...
+- I deployed contract mutex_near and test_mutex;
+- In contract `test_mutex`:
+    * I organize  two cross-contract calls to `cross_call_mutex` in contract `mutex_near` in two transactions in the same block, the related interface is`test_mutex::cross_call_test`;
+- In contract `mutex_near`:
+    * Set a state(`md: MyData`) with a lock operation , and then make a cross-contract call to `test_mutex::visit_state`;
+    * The lock operation can be execute before or after the cross-contract call because of the atomic of the transaction, but must be execute before setting the state;
+    * The result will be shown in the related call back function(`callback_and_unlock`), the unlock operation must be execute the first line;
+- In contract `test_mutex`:
+    * 
 
 ## Getting started
 
