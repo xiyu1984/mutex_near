@@ -30,7 +30,7 @@ If we add a mechanism like locker, the problom will be solved.
 - Print the result in `callback_and_unlock`(In fact we can check the state in `test_mutex`).
 
 
-## Getting started
+## About Near Contract(Rust)
 
 To get started with this template:
 
