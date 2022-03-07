@@ -12,8 +12,8 @@ const GAS_FOR_CALLBACK: Gas = Gas(5_000_000_000_000);
 #[serde(crate = "near_sdk::serde")]
 pub struct MyData{
     s: String,
-    i: i32,
-    v: Vec<i32>,
+    i: u64,
+    v: Vec<u64>,
 }
 
 #[near_bindgen]

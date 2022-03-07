@@ -12,8 +12,8 @@ const GAS_FOR_CALLBACK: Gas = Gas(5_000_000_000_000);
 #[serde(crate = "near_sdk::serde")]
 pub struct MyData{
     s: String,
-    i: i32,
-    v: Vec<i32>,
+    i: u64,
+    v: Vec<u64>,
 }
 
 #[near_bindgen]
@@ -56,6 +56,8 @@ impl Contract {
 
         // the state we keep before cross-contract call finished. (That is, we don't unlock before the `callback_and_unlock` completed.)
         self.md.i += 1;
+        // Block height can make confusing in `near_sdk_sim`
+        // self.md.i = env::block_height().into();
         self.md.v.push(self.md.i);
 
         Promise::new(account_id)
@@ -64,6 +66,8 @@ impl Contract {
             0, 
             GAS_FOR_FUNCTION_CALL)
         .then(ext_self::callback_and_unlock(env::current_account_id(), 0, GAS_FOR_CALLBACK));
+
+        // self.lock();
     }
 
     pub fn getContext(&self) -> MyData{
